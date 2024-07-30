@@ -1,0 +1,129 @@
+{
+	"name": "exceltosql",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSQLLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Ware_house_ID",
+				"type": "varchar"
+			},
+			{
+				"name": "WH_Manager_ID",
+				"type": "varchar"
+			},
+			{
+				"name": "Location_type",
+				"type": "varchar"
+			},
+			{
+				"name": "WH_capacity_size",
+				"type": "varchar"
+			},
+			{
+				"name": "zone",
+				"type": "varchar"
+			},
+			{
+				"name": "WH_regional_zone",
+				"type": "varchar"
+			},
+			{
+				"name": "num_refill_req_l3m",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "transport_issue_l1y",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Competitor_in_mkt",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "retail_shop_num",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "wh_owner_type",
+				"type": "varchar"
+			},
+			{
+				"name": "distributor_num",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "flood_impacted",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "flood_proof",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "electric_supply",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "dist_from_hub",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "workers_num",
+				"type": "float",
+				"precision": 15
+			},
+			{
+				"name": "wh_est_year",
+				"type": "float",
+				"precision": 15
+			},
+			{
+				"name": "storage_issue_reported_l3m",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "temp_reg_mach",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "approved_wh_govt_certificate",
+				"type": "varchar"
+			},
+			{
+				"name": "wh_breakdown_l3m",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "govt_check_l3m",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "product_wg_ton",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "fmcgdata"
+		}
+	}
+}

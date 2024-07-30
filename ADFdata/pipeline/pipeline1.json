@@ -1,0 +1,354 @@
+{
+	"name": "pipeline1",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "ExcelSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "upsert",
+						"upsertSettings": {
+							"useTempDB": true,
+							"keys": [
+								"Ware_house_ID"
+							]
+						},
+						"sqlWriterUseTableLock": false,
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "Ware_house_ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Ware_house_ID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "WH_Manager_ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "WH_Manager_ID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Location_type",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Location_type",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "WH_capacity_size",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "WH_capacity_size",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "zone",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "zone",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "WH_regional_zone",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "WH_regional_zone",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "num_refill_req_l3m",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "num_refill_req_l3m",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "transport_issue_l1y",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "transport_issue_l1y",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Competitor_in_mkt",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Competitor_in_mkt",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "retail_shop_num",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "retail_shop_num",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "wh_owner_type",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "wh_owner_type",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "distributor_num",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "distributor_num",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "flood_impacted",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "flood_impacted",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "flood_proof",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "flood_proof",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "electric_supply",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "electric_supply",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "dist_from_hub",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "dist_from_hub",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "workers_num",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "workers_num",
+									"type": "Double",
+									"physicalType": "float"
+								}
+							},
+							{
+								"source": {
+									"name": "wh_est_year",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "wh_est_year",
+									"type": "Double",
+									"physicalType": "float"
+								}
+							},
+							{
+								"source": {
+									"name": "storage_issue_reported_l3m",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "storage_issue_reported_l3m",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "temp_reg_mach",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "temp_reg_mach",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "approved_wh_govt_certificate",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "approved_wh_govt_certificate",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "wh_breakdown_l3m",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "wh_breakdown_l3m",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "govt_check_l3m",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "govt_check_l3m",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "product_wg_ton",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "product_wg_ton",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Excellinked",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "exceltosql",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"annotations": []
+	}
+}
