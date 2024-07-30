@@ -52,7 +52,7 @@
 					{
 						"activity": "Github to cosmosdb",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
@@ -103,7 +103,7 @@
 					{
 						"activity": "DataLake to Cosmosdb",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
