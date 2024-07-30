@@ -1,0 +1,1082 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "AzureDataFactory-Capstone-FMCG"
+		},
+		"ADLLinkedService_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ADLLinkedService'"
+		},
+		"AzureSQLLinkedService_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'AzureSQLLinkedService'"
+		},
+		"CosmosdbLinkedService_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'CosmosdbLinkedService'"
+		},
+		"ADLLinkedService_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://storageacccapstonefmcg.dfs.core.windows.net/"
+		},
+		"AzureSQLLinkedService_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "adminmubeen.database.windows.net"
+		},
+		"AzureSQLLinkedService_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "AzureSQLDatabase-Capstone-FMCG"
+		},
+		"AzureSQLLinkedService_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminmubeen"
+		},
+		"GithubLinkedService_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://raw.githubusercontent.com/"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/Capstone_main')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Github to cosmosdb",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "CosmosDbSqlApiSink",
+								"writeBehavior": "upsert",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "GithubData",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DatatoCosmosdb",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "DataLake to Cosmosdb",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Github to cosmosdb",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"sink": {
+								"type": "CosmosDbSqlApiSink",
+								"writeBehavior": "upsert",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "DataLakeData",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DatatoCosmosdb",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "AzureSQL to Cosmosdb",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "DataLake to Cosmosdb",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "CosmosDbSqlApiSink",
+								"writeBehavior": "upsert",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "AzureSQLData",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DatatoCosmosdb",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/GithubData')]",
+				"[concat(variables('factoryId'), '/datasets/DatatoCosmosdb')]",
+				"[concat(variables('factoryId'), '/datasets/DataLakeData')]",
+				"[concat(variables('factoryId'), '/datasets/AzureSQLData')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ExcelSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"Ware_house_ID"
+									]
+								},
+								"sqlWriterUseTableLock": false,
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "Ware_house_ID",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Ware_house_ID",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "WH_Manager_ID",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "WH_Manager_ID",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Location_type",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Location_type",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "WH_capacity_size",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "WH_capacity_size",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "zone",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "zone",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "WH_regional_zone",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "WH_regional_zone",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "num_refill_req_l3m",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "num_refill_req_l3m",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "transport_issue_l1y",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "transport_issue_l1y",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "Competitor_in_mkt",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Competitor_in_mkt",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "retail_shop_num",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "retail_shop_num",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "wh_owner_type",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "wh_owner_type",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "distributor_num",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "distributor_num",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "flood_impacted",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "flood_impacted",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "flood_proof",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "flood_proof",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "electric_supply",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "electric_supply",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "dist_from_hub",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "dist_from_hub",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "workers_num",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "workers_num",
+											"type": "Double",
+											"physicalType": "float"
+										}
+									},
+									{
+										"source": {
+											"name": "wh_est_year",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "wh_est_year",
+											"type": "Double",
+											"physicalType": "float"
+										}
+									},
+									{
+										"source": {
+											"name": "storage_issue_reported_l3m",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "storage_issue_reported_l3m",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "temp_reg_mach",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "temp_reg_mach",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "approved_wh_govt_certificate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "approved_wh_govt_certificate",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "wh_breakdown_l3m",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "wh_breakdown_l3m",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "govt_check_l3m",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "govt_check_l3m",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "product_wg_ton",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "product_wg_ton",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "Excellinked",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "exceltosql",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Excellinked')]",
+				"[concat(variables('factoryId'), '/datasets/exceltosql')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSQLData')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSQLLinkedService",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "Ware_house_ID",
+						"type": "varchar"
+					},
+					{
+						"name": "WH_Manager_ID",
+						"type": "varchar"
+					},
+					{
+						"name": "Location_type",
+						"type": "varchar"
+					},
+					{
+						"name": "WH_capacity_size",
+						"type": "varchar"
+					},
+					{
+						"name": "zone",
+						"type": "varchar"
+					},
+					{
+						"name": "WH_regional_zone",
+						"type": "varchar"
+					},
+					{
+						"name": "num_refill_req_l3m",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "transport_issue_l1y",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Competitor_in_mkt",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "retail_shop_num",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "wh_owner_type",
+						"type": "varchar"
+					},
+					{
+						"name": "distributor_num",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "flood_impacted",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "flood_proof",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "electric_supply",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "dist_from_hub",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "workers_num",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "wh_est_year",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "storage_issue_reported_l3m",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "temp_reg_mach",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "approved_wh_govt_certificate",
+						"type": "varchar"
+					},
+					{
+						"name": "wh_breakdown_l3m",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "govt_check_l3m",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "product_wg_ton",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "fmcgdata"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSQLLinkedService')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DataLakeData')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ADLLinkedService",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "FMCG_data_part2.json",
+						"fileSystem": "dataset"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ADLLinkedService')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DatatoCosmosdb')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "CosmosdbLinkedService",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "CosmosDbSqlApiCollection",
+				"schema": {},
+				"typeProperties": {
+					"collectionName": "fmcg_data"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/CosmosdbLinkedService')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Excellinked')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ADLLinkedService",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Excel",
+				"typeProperties": {
+					"sheetName": "Sheet1",
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "FMCG_data_part3.xlsx",
+						"fileSystem": "demo"
+					},
+					"firstRowAsHeader": true
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ADLLinkedService')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/GithubData')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "GithubLinkedService",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": "mubeentm/Capstone/main/datasets/FMCG_data_part1.csv"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/GithubLinkedService')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/exceltosql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSQLLinkedService",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "Ware_house_ID",
+						"type": "varchar"
+					},
+					{
+						"name": "WH_Manager_ID",
+						"type": "varchar"
+					},
+					{
+						"name": "Location_type",
+						"type": "varchar"
+					},
+					{
+						"name": "WH_capacity_size",
+						"type": "varchar"
+					},
+					{
+						"name": "zone",
+						"type": "varchar"
+					},
+					{
+						"name": "WH_regional_zone",
+						"type": "varchar"
+					},
+					{
+						"name": "num_refill_req_l3m",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "transport_issue_l1y",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Competitor_in_mkt",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "retail_shop_num",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "wh_owner_type",
+						"type": "varchar"
+					},
+					{
+						"name": "distributor_num",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "flood_impacted",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "flood_proof",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "electric_supply",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "dist_from_hub",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "workers_num",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "wh_est_year",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "storage_issue_reported_l3m",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "temp_reg_mach",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "approved_wh_govt_certificate",
+						"type": "varchar"
+					},
+					{
+						"name": "wh_breakdown_l3m",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "govt_check_l3m",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "product_wg_ton",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "fmcgdata"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSQLLinkedService')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ADLLinkedService')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('ADLLinkedService_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('ADLLinkedService_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSQLLinkedService')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('AzureSQLLinkedService_properties_typeProperties_server')]",
+					"database": "[parameters('AzureSQLLinkedService_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('AzureSQLLinkedService_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('AzureSQLLinkedService_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CosmosdbLinkedService')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "CosmosDb",
+				"typeProperties": {
+					"connectionString": "[parameters('CosmosdbLinkedService_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/GithubLinkedService')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('GithubLinkedService_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

@@ -1,0 +1,98 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "AzureDataFactory-Capstone-FMCG"
+		},
+		"ADLLinkedService_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ADLLinkedService'"
+		},
+		"AzureSQLLinkedService_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'AzureSQLLinkedService'"
+		},
+		"CosmosdbLinkedService_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'CosmosdbLinkedService'"
+		},
+		"ADLLinkedService_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://storageacccapstonefmcg.dfs.core.windows.net/"
+		},
+		"AzureSQLLinkedService_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "adminmubeen.database.windows.net"
+		},
+		"AzureSQLLinkedService_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "AzureSQLDatabase-Capstone-FMCG"
+		},
+		"AzureSQLLinkedService_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminmubeen"
+		},
+		"GithubLinkedService_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://raw.githubusercontent.com/"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "AzureDataFactory-Capstone-FMCG_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"ADLLinkedService_accountKey": {
+						"value": "[parameters('ADLLinkedService_accountKey')]"
+					},
+					"AzureSQLLinkedService_password": {
+						"value": "[parameters('AzureSQLLinkedService_password')]"
+					},
+					"CosmosdbLinkedService_connectionString": {
+						"value": "[parameters('CosmosdbLinkedService_connectionString')]"
+					},
+					"ADLLinkedService_properties_typeProperties_url": {
+						"value": "[parameters('ADLLinkedService_properties_typeProperties_url')]"
+					},
+					"AzureSQLLinkedService_properties_typeProperties_server": {
+						"value": "[parameters('AzureSQLLinkedService_properties_typeProperties_server')]"
+					},
+					"AzureSQLLinkedService_properties_typeProperties_database": {
+						"value": "[parameters('AzureSQLLinkedService_properties_typeProperties_database')]"
+					},
+					"AzureSQLLinkedService_properties_typeProperties_userName": {
+						"value": "[parameters('AzureSQLLinkedService_properties_typeProperties_userName')]"
+					},
+					"GithubLinkedService_properties_typeProperties_url": {
+						"value": "[parameters('GithubLinkedService_properties_typeProperties_url')]"
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

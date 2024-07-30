@@ -1,0 +1,39 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "AzureDataFactory-Capstone-FMCG"
+		},
+		"ADLLinkedService_accountKey": {
+			"value": ""
+		},
+		"AzureSQLLinkedService_password": {
+			"value": ""
+		},
+		"CosmosdbLinkedService_connectionString": {
+			"value": ""
+		},
+		"ADLLinkedService_properties_typeProperties_url": {
+			"value": "https://storageacccapstonefmcg.dfs.core.windows.net/"
+		},
+		"AzureSQLLinkedService_properties_typeProperties_server": {
+			"value": "adminmubeen.database.windows.net"
+		},
+		"AzureSQLLinkedService_properties_typeProperties_database": {
+			"value": "AzureSQLDatabase-Capstone-FMCG"
+		},
+		"AzureSQLLinkedService_properties_typeProperties_userName": {
+			"value": "adminmubeen"
+		},
+		"GithubLinkedService_properties_typeProperties_url": {
+			"value": "https://raw.githubusercontent.com/"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
