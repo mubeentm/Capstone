@@ -280,7 +280,83 @@
 				},
 				"annotations": [],
 				"type": "CosmosDbSqlApiCollection",
-				"schema": {},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"Ware_house_ID": {
+							"type": "string"
+						},
+						"WH_Manager_ID": {
+							"type": "string"
+						},
+						"Location_type": {
+							"type": "string"
+						},
+						"WH_capacity_size": {
+							"type": "string"
+						},
+						"zone": {
+							"type": "string"
+						},
+						"WH_regional_zone": {
+							"type": "string"
+						},
+						"num_refill_req_l3m": {
+							"type": "string"
+						},
+						"transport_issue_l1y": {
+							"type": "string"
+						},
+						"Competitor_in_mkt": {
+							"type": "string"
+						},
+						"retail_shop_num": {
+							"type": "string"
+						},
+						"wh_owner_type": {
+							"type": "string"
+						},
+						"distributor_num": {
+							"type": "string"
+						},
+						"flood_impacted": {
+							"type": "string"
+						},
+						"flood_proof": {
+							"type": "string"
+						},
+						"electric_supply": {
+							"type": "string"
+						},
+						"dist_from_hub": {
+							"type": "string"
+						},
+						"workers_num": {
+							"type": "string"
+						},
+						"wh_est_year": {
+							"type": "string"
+						},
+						"storage_issue_reported_l3m": {
+							"type": "string"
+						},
+						"temp_reg_mach": {
+							"type": "string"
+						},
+						"approved_wh_govt_certificate": {
+							"type": "string"
+						},
+						"wh_breakdown_l3m": {
+							"type": "string"
+						},
+						"govt_check_l3m": {
+							"type": "string"
+						},
+						"product_wg_ton": {
+							"type": "string"
+						}
+					}
+				},
 				"typeProperties": {
 					"collectionName": "fmcg_data"
 				}
@@ -607,7 +683,7 @@
 							{
 								"activity": "Github to cosmosdb",
 								"dependencyConditions": [
-									"Completed"
+									"Succeeded"
 								]
 							}
 						],
@@ -660,7 +736,7 @@
 							{
 								"activity": "DataLake to Cosmosdb",
 								"dependencyConditions": [
-									"Completed"
+									"Succeeded"
 								]
 							}
 						],
