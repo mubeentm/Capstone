@@ -1,0 +1,22 @@
+{
+	"name": "GithubData",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "GithubLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "mubeentm/Capstone/main/datasets/FMCG_data_part1.csv"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}

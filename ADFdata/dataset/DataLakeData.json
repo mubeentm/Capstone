@@ -1,0 +1,19 @@
+{
+	"name": "DataLakeData",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ADLLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "FMCG_data_part2.json",
+				"fileSystem": "dataset"
+			}
+		},
+		"schema": {}
+	}
+}
