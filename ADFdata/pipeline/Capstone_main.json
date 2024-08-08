@@ -48,14 +48,7 @@
 			{
 				"name": "DataLake to Cosmosdb",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Github to cosmosdb",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -99,14 +92,7 @@
 			{
 				"name": "AzureSQL to Cosmosdb",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "DataLake to Cosmosdb",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -140,6 +126,72 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "Transformations",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "Github to cosmosdb",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "DataLake to Cosmosdb",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "AzureSQL to Cosmosdb",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/mubeentm@outlook.com/Transformations"
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricksLinkedService",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Visualization",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "Transformations",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/mubeentm@outlook.com/CAPSTONE_VISUALIZATION"
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricksLinkedService",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"annotations": []
