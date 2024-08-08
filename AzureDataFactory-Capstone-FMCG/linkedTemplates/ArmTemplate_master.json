@@ -11,6 +11,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'ADLLinkedService'"
 		},
+		"AzureDatabricksLinkedService_accessToken": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accessToken' of 'AzureDatabricksLinkedService'"
+		},
 		"AzureSQLLinkedService_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'AzureSQLLinkedService'"
@@ -22,6 +26,10 @@
 		"ADLLinkedService_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://storageacccapstonefmcg.dfs.core.windows.net/"
+		},
+		"AzureDatabricksLinkedService_properties_typeProperties_existingClusterId": {
+			"type": "string",
+			"defaultValue": "0806-095844-h3oyc6n0"
 		},
 		"AzureSQLLinkedService_properties_typeProperties_server": {
 			"type": "string",
@@ -69,6 +77,9 @@
 					"ADLLinkedService_accountKey": {
 						"value": "[parameters('ADLLinkedService_accountKey')]"
 					},
+					"AzureDatabricksLinkedService_accessToken": {
+						"value": "[parameters('AzureDatabricksLinkedService_accessToken')]"
+					},
 					"AzureSQLLinkedService_password": {
 						"value": "[parameters('AzureSQLLinkedService_password')]"
 					},
@@ -77,6 +88,9 @@
 					},
 					"ADLLinkedService_properties_typeProperties_url": {
 						"value": "[parameters('ADLLinkedService_properties_typeProperties_url')]"
+					},
+					"AzureDatabricksLinkedService_properties_typeProperties_existingClusterId": {
+						"value": "[parameters('AzureDatabricksLinkedService_properties_typeProperties_existingClusterId')]"
 					},
 					"AzureSQLLinkedService_properties_typeProperties_server": {
 						"value": "[parameters('AzureSQLLinkedService_properties_typeProperties_server')]"

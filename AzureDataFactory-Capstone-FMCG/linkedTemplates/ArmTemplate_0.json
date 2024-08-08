@@ -11,6 +11,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'ADLLinkedService'"
 		},
+		"AzureDatabricksLinkedService_accessToken": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accessToken' of 'AzureDatabricksLinkedService'"
+		},
 		"AzureSQLLinkedService_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'AzureSQLLinkedService'"
@@ -22,6 +26,10 @@
 		"ADLLinkedService_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://storageacccapstonefmcg.dfs.core.windows.net/"
+		},
+		"AzureDatabricksLinkedService_properties_typeProperties_existingClusterId": {
+			"type": "string",
+			"defaultValue": "0806-095844-h3oyc6n0"
 		},
 		"AzureSQLLinkedService_properties_typeProperties_server": {
 			"type": "string",
@@ -57,6 +65,24 @@
 						"type": "SecureString",
 						"value": "[parameters('ADLLinkedService_accountKey')]"
 					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDatabricksLinkedService')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-408510410495706.6.azuredatabricks.net",
+					"accessToken": {
+						"type": "SecureString",
+						"value": "[parameters('AzureDatabricksLinkedService_accessToken')]"
+					},
+					"existingClusterId": "[parameters('AzureDatabricksLinkedService_properties_typeProperties_existingClusterId')]"
 				}
 			},
 			"dependsOn": []
@@ -679,14 +705,7 @@
 					{
 						"name": "DataLake to Cosmosdb",
 						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Github to cosmosdb",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -732,14 +751,7 @@
 					{
 						"name": "AzureSQL to Cosmosdb",
 						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "DataLake to Cosmosdb",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -775,6 +787,72 @@
 								"parameters": {}
 							}
 						]
+					},
+					{
+						"name": "Transformations",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "Github to cosmosdb",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "DataLake to Cosmosdb",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "AzureSQL to Cosmosdb",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Users/mubeentm@outlook.com/Transformations"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureDatabricksLinkedService",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Visualization",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "Transformations",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Users/mubeentm@outlook.com/CAPSTONE_VISUALIZATION"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureDatabricksLinkedService",
+							"type": "LinkedServiceReference"
+						}
 					}
 				],
 				"policy": {
@@ -786,7 +864,8 @@
 				"[concat(variables('factoryId'), '/datasets/GithubData')]",
 				"[concat(variables('factoryId'), '/datasets/DatatoCosmosdb')]",
 				"[concat(variables('factoryId'), '/datasets/DataLakeData')]",
-				"[concat(variables('factoryId'), '/datasets/AzureSQLData')]"
+				"[concat(variables('factoryId'), '/datasets/AzureSQLData')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricksLinkedService')]"
 			]
 		},
 		{

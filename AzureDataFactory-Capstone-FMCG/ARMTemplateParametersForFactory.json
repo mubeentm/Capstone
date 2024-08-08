@@ -8,6 +8,9 @@
 		"ADLLinkedService_accountKey": {
 			"value": ""
 		},
+		"AzureDatabricksLinkedService_accessToken": {
+			"value": ""
+		},
 		"AzureSQLLinkedService_password": {
 			"value": ""
 		},
@@ -16,6 +19,9 @@
 		},
 		"ADLLinkedService_properties_typeProperties_url": {
 			"value": "https://storageacccapstonefmcg.dfs.core.windows.net/"
+		},
+		"AzureDatabricksLinkedService_properties_typeProperties_existingClusterId": {
+			"value": "0806-095844-h3oyc6n0"
 		},
 		"AzureSQLLinkedService_properties_typeProperties_server": {
 			"value": "adminmubeen.database.windows.net"
